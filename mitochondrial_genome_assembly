@@ -11,13 +11,74 @@ conda install -c bioconda entrez-direct #tool 3
 ## Step 1: Download refseq plant mitogenome data from ncbi
 ## We fetched from https://www.ncbi.nlm.nih.gov/genome/browse#!/organelles/ , plant mitogenome, and use that list of accesion to download the data
 
-
 ```python
 
 vi refseq.list #prepare the refsequence list on mitogenome data from ncbi
 source activate ncbidownload_env
 (epost 16.2)
 epost -input refseq.list -db nucleotide | efetch -format fasta > plant.mito.refseq.fasta
+source deactivate ncbidownload_env
 
+```
+
+##Step 2: Mapping ONT raw reads onto refseq mitogenome(plant.mito.refseq.fasta)
 
 ```python
+
+source activate minimap2_env
+minimap2 -t 64 -ax map-ont plant.mito.refseq.fasta input.fq > output.mito.sam &
+
+```
+
+##Step 3: Convert sam to bam and bam to fastq
+
+```python
+
+samtools view -@ 64 -S -b output.mito.sam > output.mito.sam.bam &
+samtools sort -@ 64 -o output.mito.sam.bam.sorted output.mito.sam.bam &
+samtools fastq output.mito.sam.bam.sorted > output_reads_ONT.fq &
+
+```
+
+##Step 4: Assembly
+
+```python
+
+```
+
+##Step 5: Assembly result
+
+```python
+
+assembly-stats result.fasta > result_stats.txt
+samtools faidx result.fasta
+cat result.fasta.fai > result.fasta.txt
+
+```
+
+##Step 6: Blastn with result.fasta
+
+```python
+
+blastn -num_threads 64 -subject plant.mito.refseq.fasta -query result.fasta -out mito_blast -outfmt 6 &
+awk '{ if ($3 >= 90) { print } }' mito_blast.txt  > mito_90.txt
+awk '{ if ($4 >= 1000) { print } }' mito_90.txt > mito_i90_l1000.txt
+
+```
+
+##Step 7: Separate candidate mito_contig from result.fasta
+
+```python
+
+vi mito_assembly.seq.list
+seqtk subseq result.fasta mito_assembly.seq.list > mito_assembly.candidate.fasta
+
+```
+
+##Step 8: Blastn with candidate contig to confirm
+
+```python
+
+blastn -num_threads 64 -subject plant.mito.refseq.fasta -query mito_assembly.candidate.fasta -out mito_assembly.candidate_blast -outfmt 6 &
+
+```
