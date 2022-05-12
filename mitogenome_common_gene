@@ -1,0 +1,47 @@
+###Preparing data
+
+##Download common gene(CDS) to ref.mitogenome from https://www.ncbi.nlm.nih.gov/genome/browse#!/organelles/
+
+
+##Download protein sequence for gene protein product id required in ref.mitogenome plant
+
+vi 01_atp1.list  ##list of protein product id to ref.mitogenome plant
+source activate ncbidownload_env
+epost -input 01_atp1.list -db protein | efetch -format fasta > 01_atp1.fasta &
+source deactivate ncbidownload_env
+
+
+##Keep the firet column header and remove another header in files of protein sequence fasta
+mkdir arranged
+#in house scripts
+for i in *.fasta
+do
+base=$(basename $i .fasta)
+cat $i | awk -F' ' '{print $1}' > arranged/${base}.fasta
+done
+
+
+##Changeing the header name
+grep "^>" file.fasta
+#you should change the header of file.fasta
+sed -i 's/YP_009430479.1/sol/g' 02_atp6.fasta && \
+sed -i 's/YP_009430420.1/plg/g' 02_atp6.fasta && \
+sed -i 's/YP_009355883.1/dih/g' 02_atp6.fasta && \
+sed -i 's/YP_173362.1/nit/g' 02_atp6.fasta
+.......
+#you can replace the header to symbol name for plant
+
+
+##merged with required protein sequence in download file.fasta
+#converting extraction protein sequence .txt file to .fasta format
+cat rps13_mito.txt >rps13_mito.fasta && \
+cat rps3_mito.txt >rps3_mito.fasta && \
+cat rps4_mito.txt >rps4_mito.fasta
+.......
+#merged
+cat 14_rps4.fasta rps4_mito.fasta >14_merged_rps4.fasta && \
+cat 15_rps12.fasta rps12_mito.fasta >15_merged_rps12.fasta && \
+cat 16_rps13.fasta rps13_mito.fasta >16_merged_rps13.fasta
+
+
+### tree
