@@ -1,0 +1,43 @@
+DnaSP, DNA sequence polymorphism, is an interactive computer program for the analysis of DNA
+polymorphism from nucleotide sequence data. The program calculates several measures of DNA sequence
+variation within and between populations (with or without the sliding window method) in noncoding,
+synonymous or nonsynonymous sites; linkage disequilibrium, recombination, gene flow and gene
+conversion parameters; and also computes some neutrality tests, Fu and Li's, Hudson, Kreitman and
+Aguadé's, McDonald and Kreitman, and Tajima's tests. DnaSP can also conduct computer simulations
+based on the coalescent process. The input data file is a multiple sequence alignment (MSA), or (new in
+version 6) a Multi-MSA file format.
+http://www.ub.edu/dnasp/DnaSP6_Documentation_6.12.pdf
+
+
+###Processing for preparing data
+#You align multi FASTA files(ref.mitogenome vs assembly mitogenome) to DnaSP.
+#Before that, you extract fasta files from list of ref.mitogenome or download fasta files from NCBI. ex) NC_numbers
+
+grep ">NC_numbers" refseq.fasta
+samtools faidx refseq.fasta NC_numbers > output.fasta(NC_numbers)
+
+
+#Change header of fasta file
+
+sed -i 's/original_NC_name/changed_name/g' output.fasta && \
+sed -i 's/original_NC_name/changed_name/g' output.fasta
+
+
+#mafft activate (Multiple alignment program for amino acid or nucleotide sequences based on fast Fourier transform)
+
+source activate mafft_env
+mafft --thread 32 --auto merged.fasta > merged.fasta.mafft
+conda deactivate
+#If compared fasta_files data have much variation in each, cannot produce mafft output file. In this case, select closed species in phylogentic tree.
+#When use &> log_file & , output file is converted to log_file
+
+
+#Trimming alignment fasta files
+
+source activate trimal_env
+trimal -automated1 -in merged.fasta.mafft -out merged.fasta.mafft.trimal
+conda deactivate
+#After trimming, DnaSP results are different about polymorphism position.
+
+
+###After prepare the alignment fasta files, use the files as input files.
