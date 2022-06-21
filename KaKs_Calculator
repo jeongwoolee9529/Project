@@ -1,0 +1,23 @@
+# KaKs_Calculator is a program that calculates nonsynonymous (Ka) and synonymous (Ks) substitution rates through model selection and model averaging.
+
+# Methods for calculating Ka and Ks
+Calculating Ka and Ks normally involves three steps. Let us assume that the number of lengths between two DNA sequences compared is n and the number of substitutions
+between them is m. To calculate Ka and Ks, we need to count the numbers of synonymous (S) and nonsynonymous (N) sites (S + N = n) and the numbers of synonymous (Sd) 
+and nonsynonymous (Nd) substitutions (Sd + Nd = m). Then it is after correcting multiple substitutions that (Nd/N) and (Sd/S) could represent Ka and Ks, respectively, 
+since the observed number of substitutions underestimates the real number of substitutions as sequences diverge over time.
+Therefore, we can conclude from mentioned above that these methods normally involve three steps to estimate Ka and Ks: counting S and N, counting Sd and Nd, and 
+correction for multiple substitutions.
+
+# Format of sequence
+KaKs_Calculator accepts quasi-AXT sequence format as follows. Before calculation, gaps and stop codons between compared sequences will be removed.
+For example:
+NP_000026
+ATGCTCCTGTG-CCACTGGCC
+ATCCCC-TGCGCTCACTGGAC 
+
+NP_000053
+ACAGaTtCTACCc-GCCcACTA--GgtGtt
+---ggTTCTCCtACCcA-G-CACTACTggg
+
+Each pair of sequences in an axt file contains three lines: a sequence name line and 2 sequence lines. Pairwise sequences are separated from one another by blank lines.
+CAUTION) When you prepare the input file format in linux, some input file is not working following the Format. Try to use "Enter" between pair of sequences.
